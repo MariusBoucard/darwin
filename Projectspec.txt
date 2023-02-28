@@ -1,0 +1,3 @@
+We re gonna use multiple differents librairies, bur I might take a look at api from deap evol and pillow 
+
+-> Have to choose with deap and evol
