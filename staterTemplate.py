@@ -1,3 +1,6 @@
+import json
+import multiprocessing
+import statistics
 import sys
 import random
 from deap import creator, base, tools, algorithms
@@ -25,22 +28,33 @@ def draw(solution):
     for polygon in solution:
         canvas.polygon(polygon[1:], fill=polygon[0])
 
-    image.save("solution.png")
     return image
 
-
+#Diff kind of mutation I can Try to choose and implement
+# (add / update / replace polygon, change points / colour / z-order)
+#Don't forget that we re on a image, so all tje triangle are here
 def mutate(solution, indpb):
     if random.random() < 0.5:
         # mutate points
         polygon = random.choice(solution)
         coords = [x for point in polygon[1:] for x in point]
-        # tools.mutGaussian(coords, 0, 10, indpb)
+        tools.mutGaussian(coords, 0, 10, indpb)
         coords = [max(0, min(int(x), 200)) for x in coords]
         polygon[1:] = list(zip(coords[::2], coords[1::2]))
     else:
-            # reorder polygons
-            tools.mutShuffleIndexes(solution, indpb)
+            # change color of polynome
+            for i in range(10):
+                    polygon = random.choice(solution)
+                    
+            # reorder polygons 
+
+            # tools.mutShuffleIndexes(solution, indpb)
+            # print("\n\n\n")
+            # print(solution)
+            # print("\n\n")
             
+    #La solution est une liste de polygiones, pour l'instant on a ca
+    #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
     return solution,
 
 
@@ -72,6 +86,8 @@ def run(generations=500, population_size=100,  seed=31):
 
     random.seed(seed)
     toolbox = base.Toolbox()
+    pool = multiprocessing.Pool(8)
+    toolbox.register("map", pool.map)
     # toolbox.register("mutate", mutate, indpb=0.05)
     toolbox.register("individual", tools.initRepeat, creator.Individual,  make_polygon, n=100)
     toolbox.register("population",tools.initRepeat, list, toolbox.individual)
@@ -85,31 +101,48 @@ def run(generations=500, population_size=100,  seed=31):
     toolbox.register("evaluate", evaluate)
     #Whitch selection algorithm we're using
     toolbox.register("select", tools.selection.selBest)
-    population = toolbox.population( n=population_size)
 
-    draw(population[0])
+    #Create population
+    population = toolbox.population( n=population_size)
+    hof = tools.HallOfFame(3)
+    stats = tools.Statistics(lambda x: x.fitness.values[0])
+    stats.register("avg", statistics.mean)
+    stats.register("std", statistics.stdev)
+
+    population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=0.1,
+        ngen=50, stats=stats, halloffame=hof, verbose=False)
+
 
     # main evolution loop
     for g in range(generations):
         print("generation Nanan°"+str(g))
-        population = toolbox.select(population, len(population))
-        offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.5)
+        offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.1)
+        # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
         fitnesses = toolbox.map(toolbox.evaluate, offspring)
         population = offspring
         for value, individual in zip(fitnesses, offspring):
             individual.fitness.values  = value
+        
+        population = toolbox.select(population, len(population))
+
 
         
-    draw(population[0])
+    image =draw(population[0])
+    image.save("solution.png")
 
+    # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
+    listesol = tools.selBest(population, k=3)
+    for a in listesol:
+        image =draw(a)
+        image.save(str(random.randrange(90))+"solution.png")
 
 #
 # Should had halloffames
 #should had statistics as well
 #
 def read_config(path):
-    # read JSON or ini file, return a dictionary
-    pass
+       with open(path) as f_in:
+        return json.load(f_in)
 
 
 if __name__ == "__main__":
