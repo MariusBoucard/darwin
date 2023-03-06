@@ -6,3 +6,13 @@ We re gonna use multiple differents librairies, bur I might take a look at api f
 
 -> Cross-Over -> We should think about it carefully
 
+Selection Function -> Elitism is great 
+
+-> eaMuCommaLambda remove the parents from the solution then do selection
+
+Use multiprocessing from python (create a pool) and we can register this pool in a map function
+
+-> Build evolution : generate the offspring with mutation
+
+
+

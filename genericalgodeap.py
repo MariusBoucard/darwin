@@ -36,8 +36,8 @@ stats.register("std", statistics.stdev)
 stats.register("max",max)
 
 
-population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=0.1,
-	ngen=50, stats=stats, halloffame=hof, verbose=False)
+population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=0.7,
+	ngen=500, stats=stats, halloffame=hof, verbose=False)
 
 print(log)
 

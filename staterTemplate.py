@@ -1,13 +1,13 @@
 import json
 import multiprocessing
 import statistics
-import sys
 import random
 from deap import creator, base, tools, algorithms
 
 from PIL import Image, ImageDraw
 from PIL import ImageChops
 
+from mutationsUtils import mutate_point, change_color
 MAX = 255 * 200 * 200
 TARGET = Image.open("5a.png")
 TARGET.load()  # read image and close the file
@@ -34,21 +34,16 @@ def draw(solution):
 # (add / update / replace polygon, change points / colour / z-order)
 #Don't forget that we re on a image, so all tje triangle are here
 def mutate(solution, indpb):
+
     if random.random() < 0.5:
         # mutate points
-        polygon = random.choice(solution)
-        coords = [x for point in polygon[1:] for x in point]
-        tools.mutGaussian(coords, 0, 10, indpb)
-        coords = [max(0, min(int(x), 200)) for x in coords]
-        polygon[1:] = list(zip(coords[::2], coords[1::2]))
+        for i in range(10):
+            mutate_point(solution,tools,indpb)
     else:
-            # change color of polynome
-            for i in range(10):
-                    polygon = random.choice(solution)
-                    
+      
             # reorder polygons 
 
-            # tools.mutShuffleIndexes(solution, indpb)
+            tools.mutShuffleIndexes(solution, indpb)
             # print("\n\n\n")
             # print(solution)
             # print("\n\n")
@@ -66,7 +61,7 @@ def make_polygon():
     # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
     minalpha = 30
     maxalpha =60
-    mincol = 30
+    mincol = 0
     maxcol = 255
     mincor = 10
     maxcor = 189
@@ -108,6 +103,7 @@ def run(generations=500, population_size=100,  seed=31):
     stats = tools.Statistics(lambda x: x.fitness.values[0])
     stats.register("avg", statistics.mean)
     stats.register("std", statistics.stdev)
+    stats.register("max", max)
 
     population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=0.1,
         ngen=50, stats=stats, halloffame=hof, verbose=False)
@@ -116,8 +112,11 @@ def run(generations=500, population_size=100,  seed=31):
     # main evolution loop
     for g in range(generations):
         print("generation Nanan°"+str(g))
-        offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.1)
+
+        #2 different approaches here
+        offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.7)
         # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
+        #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
         fitnesses = toolbox.map(toolbox.evaluate, offspring)
         population = offspring
         for value, individual in zip(fitnesses, offspring):
@@ -129,7 +128,7 @@ def run(generations=500, population_size=100,  seed=31):
         
     image =draw(population[0])
     image.save("solution.png")
-
+    print(log)
     # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
     listesol = tools.selBest(population, k=3)
     for a in listesol:
