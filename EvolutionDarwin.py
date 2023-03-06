@@ -3,14 +3,22 @@ import multiprocessing
 import statistics
 import random
 from deap import creator, base, tools, algorithms
-
-from PIL import Image, ImageDraw
+from IPython.display import display # to display images
+from PIL import Image, ImageDraw, ImageTk
 from PIL import ImageChops
+import tkinter as tk
+import threading
 
-from mutationsUtils import mutate_point, change_color
+
+
+
+
+from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon
 MAX = 255 * 200 * 200
 TARGET = Image.open("5a.png")
+caca = Image.open("5c.png")
 TARGET.load()  # read image and close the file
+
 
 
 ##Don t change it please
@@ -27,26 +35,26 @@ def draw(solution):
     canvas = ImageDraw.Draw(image, "RGBA")
     for polygon in solution:
         canvas.polygon(polygon[1:], fill=polygon[0])
-
     return image
 
 #Diff kind of mutation I can Try to choose and implement
 # (add / update / replace polygon, change points / colour / z-order)
 #Don't forget that we re on a image, so all tje triangle are here
 def mutate(solution, indpb):
-
-    if random.random() < 0.5:
+    rand = random.random()
+    if rand< 0.4:
         # mutate points
         for i in range(10):
             mutate_point(solution,tools,indpb)
-    else:
-      
-            # reorder polygons 
-
+    elif 0.4<rand<0.6:
             tools.mutShuffleIndexes(solution, indpb)
-            # print("\n\n\n")
-            # print(solution)
-            # print("\n\n")
+    # elif 0.4<rand<0.6 :
+    #         # reorder polygons 
+    #         remove_polygon(solution,3)
+    # elif 0.6<rand<0.8 :
+    #         add_polygone(solution,3)
+    elif 0.6<rand<1.0 : 
+            change_color(solution,3)
             
     #La solution est une liste de polygiones, pour l'instant on a ca
     #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
@@ -57,23 +65,11 @@ def mutate(solution, indpb):
 
 
 
-def make_polygon():
-    # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
-    minalpha = 30
-    maxalpha =60
-    mincol = 0
-    maxcol = 255
-    mincor = 10
-    maxcor = 189
 
-    return [(random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(minalpha,maxalpha)),
-             (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor)),
-               (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor)),
-                 (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor))]
 
 
 #do some configfiles to note have to change the parameters
-def run(generations=500, population_size=100,  seed=31):
+def run(generations=500, population_size=100,  seed=31,polygons=20,mutation_rate=0.9,mating_prob = 0.5):
 # Car c est la plus procche qu'on peut avoir
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
@@ -84,7 +80,7 @@ def run(generations=500, population_size=100,  seed=31):
     pool = multiprocessing.Pool(8)
     toolbox.register("map", pool.map)
     # toolbox.register("mutate", mutate, indpb=0.05)
-    toolbox.register("individual", tools.initRepeat, creator.Individual,  make_polygon, n=100)
+    toolbox.register("individual", tools.initRepeat, creator.Individual,  make_polygon, n=polygons)
     toolbox.register("population",tools.initRepeat, list, toolbox.individual)
     
     # initialization
@@ -105,8 +101,8 @@ def run(generations=500, population_size=100,  seed=31):
     stats.register("std", statistics.stdev)
     stats.register("max", max)
 
-    population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=0.1,
-        ngen=50, stats=stats, halloffame=hof, verbose=False)
+    population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=mutation_rate,
+        ngen=generations, stats=stats, halloffame=hof, verbose=False)
 
 
     # main evolution loop
@@ -114,7 +110,7 @@ def run(generations=500, population_size=100,  seed=31):
         print("generation Nanan°"+str(g))
 
         #2 different approaches here
-        offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.7)
+        offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)
         # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
         #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
         fitnesses = toolbox.map(toolbox.evaluate, offspring)
