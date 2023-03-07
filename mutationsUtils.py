@@ -18,9 +18,11 @@ def mutate_point(solution,tools,indpb):
         tools.mutGaussian(coords, 0, 10, indpb)
         coords = [max(0, min(int(x), 200)) for x in coords]
         polygon[1:] = list(zip(coords[::2], coords[1::2]))
+
 def add_polygone(solution,nbPolygones) :
         for i in range(nbPolygones) :
                 solution.append(make_polygon())
+
 def remove_polygon(solution,nbPolygones=1):
         if  len(solution) < nbPolygones :
         # change color of polynome
@@ -38,29 +40,33 @@ def make_polygon():
     maxcol = 255
     mincor = 10
     maxcor = 189
-    firsttuple =  (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor))
-    #Try to set maximum size for the created triangle
-    secondtuple = ()
-    thirdtuple = ()
-
-
-    if firsttuple[0] > (maxcor/2):
-        if firsttuple[1]>(maxcor/2):
-               secondtuple = (random.randrange(firsttuple[0]-(maxcor/2), firsttuple[0]), random.randrange(firsttuple[1]-(maxcor/2), firsttuple[1]))
-               thirdtuple = (random.randrange(firsttuple[0]-(maxcor/2), firsttuple[0]), random.randrange(firsttuple[1]-(maxcor/2), firsttuple[1]))
-        else :
-                secondtuple = (random.randrange(firsttuple[0]-(maxcor/2), firsttuple[0]), random.randrange( firsttuple[1]),firsttuple[1]+(maxcor/2))
-                thirdtuple = (random.randrange(firsttuple[0]-(maxcor/2), firsttuple[0]), random.randrange( firsttuple[1],firsttuple[1]+(maxcor/2)))
-    else :
-           if firsttuple[1]>(maxcor/2):
-               secondtuple = (random.randrange( firsttuple[0],firsttuple[0]+(maxcor/2)), random.randrange(firsttuple[1]-(maxcor/2), firsttuple[1]))
-               thirdtuple = (random.randrange( firsttuple[0],firsttuple[0]+(maxcor/2)), random.randrange(firsttuple[1]-(maxcor/2), firsttuple[1]))
-           else :
-                secondtuple = (random.randrange( firsttuple[0],firsttuple[0]+(maxcor/2)), random.randrange( firsttuple[1]),firsttuple[1]+(maxcor/2))
-                thirdtuple = (random.randrange( firsttuple[0],firsttuple[0]+(maxcor/2)), random.randrange( firsttuple[1],firsttuple[1]+(maxcor/2)))
-            
+    
 
     return [(random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(minalpha,maxalpha)),
-            firsttuple,
-              secondtuple,
-                 thirdtuple]
+             (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor)),
+               (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor)),
+                 (random.randrange(mincor, maxcor), random.randrange(mincor, maxcor))]
+
+#TODO : add a point into the polygon -> See the slides for not doing shit
+
+
+def add_point(solution) : 
+        polygon = random.choice(solution)
+        polypoints = polygon[1:]
+
+        #Calculating the center of mass of the polygon : 
+        xmass = 0
+        ymass =0
+        for points in polypoints :
+                xmass += points[0]
+                ymass += points[1]
+        xmass = xmass/len(polypoints)
+        ymass = ymass/len(polypoints)
+
+        #Creating the vectors
+        vectors = []
+        for points in polypoints :
+                vect = (points[0]-xmass,points[1]-ymass)
+
+
+

@@ -6,8 +6,7 @@ from deap import creator, base, tools, algorithms
 from IPython.display import display # to display images
 from PIL import Image, ImageDraw, ImageTk
 from PIL import ImageChops
-import tkinter as tk
-import threading
+import sys
 
 
 
@@ -42,21 +41,20 @@ def draw(solution):
 #Don't forget that we re on a image, so all tje triangle are here
 def mutate(solution, indpb):
     rand = random.random()
-    if rand< 0.4:
+    if rand< 0.8:
         # mutate points
-        for i in range(10):
             mutate_point(solution,tools,indpb)
-    elif 0.4<rand<0.6:
-            tools.mutShuffleIndexes(solution, indpb)
-    # elif 0.4<rand<0.6 :
+    elif 0.8<rand<0.85:
+             tools.mutShuffleIndexes(solution, indpb)
+    elif 0.85<rand<0.89 :
     #         # reorder polygons 
-    #         remove_polygon(solution,3)
-    # elif 0.6<rand<0.8 :
-    #         add_polygone(solution,3)
-    elif 0.6<rand<1.0 : 
-            change_color(solution,3)
+             remove_polygon(solution,1)
+    elif 0.89<rand<0.95 :
+            add_polygone(solution,1)
+    elif 0.95<rand<1.0 : 
+            change_color(solution,1)
             
-    #La solution est une liste de polygiones, pour l'instant on a ca
+    #La solution est une liste de polygiones, pour l'instant ons a ca
     #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
     return solution,
 
@@ -67,9 +65,10 @@ def mutate(solution, indpb):
 
 
 
-
+# cross over only when fitness is low 
+# perhaps different stages that dynamic change where the fitness is
 #do some configfiles to note have to change the parameters
-def run(generations=500, population_size=100,  seed=31,polygons=20,mutation_rate=0.9,mating_prob = 0.5):
+def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01):
 # Car c est la plus procche qu'on peut avoir
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
@@ -91,7 +90,7 @@ def run(generations=500, population_size=100,  seed=31,polygons=20,mutation_rate
     #We have to tell him to evaluate the distance between both pictures
     toolbox.register("evaluate", evaluate)
     #Whitch selection algorithm we're using
-    toolbox.register("select", tools.selection.selBest)
+    toolbox.register("select", tools.selection.selLexicase)
 
     #Create population
     population = toolbox.population( n=population_size)
@@ -134,14 +133,14 @@ def run(generations=500, population_size=100,  seed=31,polygons=20,mutation_rate
 #
 # Should had halloffames
 #should had statistics as well
-#
+
 def read_config(path):
        with open(path) as f_in:
         return json.load(f_in)
 
 
 if __name__ == "__main__":
-    # params = read_config(sys.argv[1])
+    params = read_config(sys.argv[1])
     #If we define the name of attributes greately in the json it will work
     run()
     # run(**params)
