@@ -7,12 +7,9 @@ from IPython.display import display # to display images
 from PIL import Image, ImageDraw, ImageTk
 from PIL import ImageChops
 import sys
+from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point
 
 
-
-
-
-from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon
 MAX = 255 * 200 * 200
 TARGET = Image.open("5a.png")
 caca = Image.open("5c.png")
@@ -44,15 +41,17 @@ def mutate(solution, indpb):
     if rand< 0.8:
         # mutate points
             mutate_point(solution,tools,indpb)
-    elif 0.8<rand<0.85:
+    elif 0.8<rand<0.83:
              tools.mutShuffleIndexes(solution, indpb)
-    elif 0.85<rand<0.89 :
+    elif 0.83<rand<0.86 :
     #         # reorder polygons 
              remove_polygon(solution,1)
-    elif 0.89<rand<0.95 :
+    elif 0.86<rand<0.92 :
             add_polygone(solution,1)
-    elif 0.95<rand<1.0 : 
+    elif 0.92<rand<0.95 : 
             change_color(solution,1)
+    else :
+         add_point(solution)
             
     #La solution est une liste de polygiones, pour l'instant ons a ca
     #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
@@ -91,6 +90,8 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
     toolbox.register("evaluate", evaluate)
     #Whitch selection algorithm we're using
     toolbox.register("select", tools.selection.selLexicase)
+    # toolbox.register("select", tools.selection.selBest)
+
 
     #Create population
     population = toolbox.population( n=population_size)
@@ -142,5 +143,5 @@ def read_config(path):
 if __name__ == "__main__":
     params = read_config(sys.argv[1])
     #If we define the name of attributes greately in the json it will work
-    run()
+    run(**params)
     # run(**params)

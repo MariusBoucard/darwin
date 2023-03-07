@@ -63,19 +63,23 @@ def add_point(solution) :
         x_mass = x_mass/len(polypoints)
         y_mass = y_mass/len(polypoints)
 
-        base_point_rang = random.randint(1,len(polypoints))
+        base_point_rang = random.randint(1,len(polypoints)-1)
         new_point = (polypoints[base_point_rang][0]-polypoints[base_point_rang-1][0],
                      polypoints[base_point_rang][1]-polypoints[base_point_rang-1][1])
         #Creating the vectors
+        new_vect = [new_point[0]-x_mass,new_point[1]-y_mass]
         vectors = []
         for points in polypoints :
                 vect = [points[0]-x_mass,points[1]-y_mass]
                 vectors.append(vect)
-        
-        for a in vectors :
-                
-        np.angle()
-
-
+        itsok = False
+        for i in range(len(polypoints)-1) :
+                if (np.angle(vectors[i])[0]<np.angle(new_vect))[0] and (np.angle(vectors[i+1])[0]>np.angle(new_vect)[0]):
+                        polypoints.insert(i,new_point)
+                        itsok = True
+                        break
+        if not itsok:
+                polypoints.append(new_point)
+[0]
 
 
