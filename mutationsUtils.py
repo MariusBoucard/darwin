@@ -1,5 +1,5 @@
 import random
-
+import numpy as np
 
 def change_color(solution,nbPolygones=1):
         minalpha = 30
@@ -55,18 +55,27 @@ def add_point(solution) :
         polypoints = polygon[1:]
 
         #Calculating the center of mass of the polygon : 
-        xmass = 0
-        ymass =0
+        x_mass = 0
+        y_mass =0
         for points in polypoints :
-                xmass += points[0]
-                ymass += points[1]
-        xmass = xmass/len(polypoints)
-        ymass = ymass/len(polypoints)
+                x_mass += points[0]
+                y_mass += points[1]
+        x_mass = x_mass/len(polypoints)
+        y_mass = y_mass/len(polypoints)
 
+        base_point_rang = random.randint(1,len(polypoints))
+        new_point = (polypoints[base_point_rang][0]-polypoints[base_point_rang-1][0],
+                     polypoints[base_point_rang][1]-polypoints[base_point_rang-1][1])
         #Creating the vectors
         vectors = []
         for points in polypoints :
-                vect = (points[0]-xmass,points[1]-ymass)
+                vect = [points[0]-x_mass,points[1]-y_mass]
+                vectors.append(vect)
+        
+        for a in vectors :
+                
+        np.angle()
+
 
 
 
