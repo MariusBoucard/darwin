@@ -1,0 +1,7 @@
+{
+    "generations" : 500,
+    "population_size" : 200,
+    "polygons" : 5,
+    "mutation_rate" : 1,
+    "mating_prob" : 0.01
+}

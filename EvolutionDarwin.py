@@ -80,7 +80,7 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
     # toolbox.register("mutate", mutate, indpb=0.05)
     toolbox.register("individual", tools.initRepeat, creator.Individual,  make_polygon, n=polygons)
     toolbox.register("population",tools.initRepeat, list, toolbox.individual)
-    
+    print("here for long")
     # initialization
     #We need a mate 
     toolbox.register("mate", tools.cxTwoPoint)
@@ -100,8 +100,8 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
     stats.register("avg", statistics.mean)
     stats.register("std", statistics.stdev)
     stats.register("max", max)
-
-    population, log = algorithms.eaSimple(population, toolbox, cxpb=0.5, mutpb=mutation_rate,
+    print("stats sets")
+    population, log = algorithms.eaSimple(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
         ngen=generations, stats=stats, halloffame=hof, verbose=False)
 
 
@@ -110,7 +110,7 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
         print("generation Nanan°"+str(g))
 
         #2 different approaches here
-        offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)
+        offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
         # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
         #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
         fitnesses = toolbox.map(toolbox.evaluate, offspring)
@@ -126,7 +126,8 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
     image.save("solution.png")
     print(log)
     # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
-    listesol = tools.selBest(population, k=3)
+    listesol =     tools.selLexicase(population,3)
+
     for a in listesol:
         image =draw(a)
         image.save(str(random.randrange(90))+"solution.png")
