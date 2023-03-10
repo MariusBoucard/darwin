@@ -11,8 +11,7 @@ from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygon
 
 
 MAX = 255 * 200 * 200
-TARGET = Image.open("5a.png")
-caca = Image.open("5c.png")
+TARGET = Image.open("5b.png")
 TARGET.load()  # read image and close the file
 
 
@@ -36,22 +35,42 @@ def draw(solution):
 #Diff kind of mutation I can Try to choose and implement
 # (add / update / replace polygon, change points / colour / z-order)
 #Don't forget that we re on a image, so all tje triangle are here
-def mutate(solution, indpb):
-    rand = random.random()
-    if rand< 0.8:
-        # mutate points
-            mutate_point(solution,tools,indpb)
-    elif 0.8<rand<0.83:
-             tools.mutShuffleIndexes(solution, indpb)
-    elif 0.83<rand<0.86 :
-    #         # reorder polygons 
-             remove_polygon(solution,1)
-    elif 0.86<rand<0.92 :
-            add_polygone(solution,1)
-    elif 0.92<rand<0.95 : 
-            change_color(solution,1)
+
+#I could add a cascade function likedoing multiple things separately,
+#TODO implement it as perhaps a different mutate function ? 
+#TODO allow user to choose its probs
+def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
+    if not independance :
+        assert int(mutate_pt+shuffle+remove_poly+add_poly+change_cr+add_pt) == 1, "mutations probabilities should sum up to 1" +str(mutate_pt+shuffle+remove_poly+add_poly+change_color+add_pt)
+        rand = random.random()
+        if rand< mutate_pt:
+                mutate_point(solution,tools,indpb)
+        elif mutate_pt<rand<(shuffle+mutate_pt):
+                tools.mutShuffleIndexes(solution, indpb)
+        elif (shuffle+mutate_pt)<rand<(shuffle+mutate_pt+remove_poly) :
+  
+                remove_polygon(solution,1)
+        elif (shuffle+mutate_pt+remove_poly)<rand<(shuffle+mutate_pt+remove_poly+add_poly) :
+                add_polygone(solution,1)
+        elif (shuffle+mutate_pt+remove_poly+add_poly)<rand<(shuffle+mutate_pt+remove_poly+add_poly+change_cr) : 
+                change_color(solution,1)
+        else :
+            add_point(solution)
     else :
-         add_point(solution)
+        rand = random.random()
+        if rand< mutate_pt:
+                mutate_point(solution,tools,indpb)
+        if rand<(shuffle):
+                tools.mutShuffleIndexes(solution, indpb)
+        if rand<remove_poly :
+                remove_polygon(solution,1)
+        if rand<add_poly :
+                add_polygone(solution,1)
+        if rand<change_cr : 
+                change_color(solution,1)
+        if rand<add_pt :
+            add_point(solution)
+
             
     #La solution est une liste de polygiones, pour l'instant ons a ca
     #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
@@ -67,7 +86,8 @@ def mutate(solution, indpb):
 # cross over only when fitness is low 
 # perhaps different stages that dynamic change where the fitness is
 #do some configfiles to note have to change the parameters
-def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01):
+def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
+        ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
 # Car c est la plus procche qu'on peut avoir
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
@@ -85,7 +105,8 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
     #We need a mate 
     toolbox.register("mate", tools.cxTwoPoint)
     #Record the mutate function
-    toolbox.register("mutate", mutate, indpb=0.05)
+    toolbox.register("mutate", mutate, indpb=0.05,
+                     mutate_pt=mutate_pt,shuffle=shuffle,remove_poly=remove_poly,add_poly=add_poly,change_cr=change_cr,add_pt=add_pt,independance=independance)
     #We have to tell him to evaluate the distance between both pictures
     toolbox.register("evaluate", evaluate)
     #Whitch selection algorithm we're using
