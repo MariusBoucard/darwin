@@ -1,7 +1,36 @@
 import random
 import numpy as np
+from PIL import Image, ImageDraw, ImageTk
+from PIL import ImageChops
+from deap import creator, base, tools, algorithms
+
+
+
+
+def evaluate(solution):
+    image = draw(solution)
+    diff = ImageChops.difference(image, TARGET)
+    hist = diff.convert("L").histogram()
+    count = sum(i * n for i, n in enumerate(hist))
+    return (MAX - count) / MAX,
+
+TARGET_NAME="5b.png"
+MAX = 255 * 200 * 200
+TARGET = Image.open(TARGET_NAME)
+TARGET.load() 
+toolbox = base.Toolbox()
+toolbox.register("evaluate", evaluate)
+
+def draw(solution):
+    image = Image.new("RGB", (200, 200))
+    canvas = ImageDraw.Draw(image, "RGBA")
+    for polygon in solution:
+        canvas.polygon(polygon[1:], fill=polygon[0])
+    return image
 
 def change_color(solution,nbPolygones=1):
+        sol2=solution
+        fitness_pre = evaluate(solution)
         minalpha = 30
         maxalpha =60
         mincol = 30
@@ -11,9 +40,12 @@ def change_color(solution,nbPolygones=1):
     
                 polygon = random.choice(solution)
                 polygon[0]=((random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(minalpha,maxalpha)))
-
+        fitness_post = evaluate(solution)
+        if fitness_pre>fitness_post:
+               solution=sol2
 def mutate_point(solution,tools,indpb):
         polygon = random.choice(solution)
+
         coords = [x for point in polygon[1:] for x in point]
         tools.mutGaussian(coords, 0, 10, indpb)
         coords = [max(0, min(int(x), 200)) for x in coords]

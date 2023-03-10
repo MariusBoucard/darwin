@@ -1,3 +1,4 @@
+import datetime
 import json
 import multiprocessing
 import statistics
@@ -9,9 +10,9 @@ from PIL import ImageChops
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point
 
-
+TARGET_NAME="5b.png"
 MAX = 255 * 200 * 200
-TARGET = Image.open("5b.png")
+TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
 
 
@@ -40,6 +41,7 @@ def draw(solution):
 #TODO implement it as perhaps a different mutate function ? 
 #TODO allow user to choose its probs
 def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
+
     if not independance :
         assert int(mutate_pt+shuffle+remove_poly+add_poly+change_cr+add_pt) == 1, "mutations probabilities should sum up to 1" +str(mutate_pt+shuffle+remove_poly+add_poly+change_color+add_pt)
         rand = random.random()
@@ -86,8 +88,9 @@ def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=
 # cross over only when fitness is low 
 # perhaps different stages that dynamic change where the fitness is
 #do some configfiles to note have to change the parameters
-def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
-        ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
+def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
+        ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False,
+        mutate_pt2=0.8,shuffle2=0.05,remove_poly2=0.02,add_poly2=0.05,change_cr2=0.03,add_pt2=0.05,independance2=False):
 # Car c est la plus procche qu'on peut avoir
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
@@ -102,7 +105,7 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
     toolbox.register("population",tools.initRepeat, list, toolbox.individual)
     print("here for long")
     # initialization
-    #We need a mate 
+    #We need a mate -> That's our crossover function
     toolbox.register("mate", tools.cxTwoPoint)
     #Record the mutate function
     toolbox.register("mutate", mutate, indpb=0.05,
@@ -141,10 +144,26 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
         
         population = toolbox.select(population, len(population))
 
+    if generations2 !=0 :
+           toolbox.register("mutate", mutate, indpb=0.05,
+                     mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)    
+           for g in range(generations2):
+                print("generation 2 Nanan°"+str(g))
 
+                offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
+                # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
+                #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
+                fitnesses = toolbox.map(toolbox.evaluate, offspring)
+                population = offspring
+                for value, individual in zip(fitnesses, offspring):
+                        individual.fitness.values  = value
+          
+
+    list1 = tools.selLexicase(population,1)
+    for a in list1:
         
-    image =draw(population[0])
-    image.save("solution.png")
+        image =draw(a)
+        image.save("solution.png")
     print(log)
     # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
     listesol =     tools.selLexicase(population,3)
@@ -153,6 +172,37 @@ def run(generations=500, population_size=100,  seed=30,polygons=20,mutation_rate
         image =draw(a)
         image.save(str(random.randrange(90))+"solution.png")
 
+    f = open("ExecutionReport-"+str(datetime.datetime.now())+".txt", "x") 
+    f.write(
+          "Execution of the code with theses parameters\n"+
+          "On this image bro "+TARGET_NAME+
+         
+        "\ngenerations : " +generations+
+        "\ngenerations2 :"+generations2+
+        "\npopulation_size :"+population_size+
+        "\nseed : "+seed,
+        "\npolygons :"+polygons+
+        "\nmutation_rate :"+mutation_rate+
+        "\nmating_prob : "+mating_prob,
+        "\nmutate_pt :"+mutate_pt+
+        "\nshuffle :"+shuffle+
+        "\nremove_poly :"+remove_poly+
+        "\nadd_poly :"+add_poly+
+        "\nchange_cr :"+change_cr+
+        "\nadd_pt :"+add_pt+
+        "\nindependance :"+False+
+        "\nmutate_pt2 :"+mutate_pt2+
+        "\nshuffle2 :"+shuffle2+
+        "\nremove_poly2"+remove_poly2+
+        "\nadd_poly2 :"+add_poly2+
+        "\nchange_cr2 :"+change_cr2+
+        "\nadd_pt2 :"+add_pt2+
+        "\nindependance2 :"+False
+         +
+         "We got theses results \n"+
+        log
+    )
+    f.close
 #
 # Should had halloffames
 #should had statistics as well
