@@ -44,18 +44,30 @@ def change_color(solution,nbPolygones=1):
         if fitness_pre>fitness_post:
                solution=sol2
 def mutate_point(solution,tools,indpb):
+        sol2=solution
+        fitness_pre = evaluate(solution)
         polygon = random.choice(solution)
 
         coords = [x for point in polygon[1:] for x in point]
         tools.mutGaussian(coords, 0, 10, indpb)
         coords = [max(0, min(int(x), 200)) for x in coords]
         polygon[1:] = list(zip(coords[::2], coords[1::2]))
+        fitness_post = evaluate(solution)
+        if fitness_pre>fitness_post:
+               solution=sol2
 
 def add_polygone(solution,nbPolygones) :
+        sol2=solution
+        fitness_pre = evaluate(solution)
         for i in range(nbPolygones) :
                 solution.append(make_polygon())
+        fitness_post = evaluate(solution)
+        if fitness_pre>fitness_post:
+               solution=sol2
 
 def remove_polygon(solution,nbPolygones=1):
+        sol2=solution
+        fitness_pre = evaluate(solution)
         if  len(solution) < nbPolygones :
         # change color of polynome
                 for i in range(nbPolygones):
@@ -63,6 +75,9 @@ def remove_polygon(solution,nbPolygones=1):
                         solution.remove(polygon)
         else: 
                 add_polygone(solution,random.randint(2,14))
+        fitness_post = evaluate(solution)
+        if fitness_pre>fitness_post:
+               solution=sol2
 
 def make_polygon():
     # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
@@ -81,6 +96,20 @@ def make_polygon():
 
 #TODO : add a point into the polygon -> See the slides for not doing shit
 
+def make_ellipse():
+        minalpha = 30
+        maxalpha =60
+        mincol = 0
+        maxcol = 255
+        mincor = 10
+        maxcor = 189
+        x_0=random.randrange(mincor, maxcor)
+        y_0=random.randrange(mincor, maxcor)
+        x_1=random.randrange(x_0, maxcor)
+        y_1=random.randrange(y_0, maxcor)
+        
+        return[(random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(mincol, maxcol), random.randrange(minalpha,maxalpha)),
+               (x_0,y_0,x_1,y_1)]
 
 def add_point(solution) : 
         polygon = random.choice(solution)
