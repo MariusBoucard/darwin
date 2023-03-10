@@ -11,5 +11,5 @@
     "add_poly" : 0.1,
     "change_cr" :0.03,
     "add_pt" : 0.1,
-    "independance" : false,
+    "independance" : false
 }

@@ -8,7 +8,7 @@ from IPython.display import display # to display images
 from PIL import Image, ImageDraw, ImageTk
 from PIL import ImageChops
 import sys
-from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point
+from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
 TARGET_NAME="5b.png"
 MAX = 255 * 200 * 200
@@ -114,9 +114,13 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     #We have to tell him to evaluate the distance between both pictures
     toolbox.register("evaluate", evaluate)
     #Whitch selection algorithm we're using
+
+    # Add a tournament selection as well
     toolbox.register("select", tools.selection.selLexicase)
     # toolbox.register("select", tools.selection.selBest)
 
+    # toolbox.register("replacement",tools.eitism)
+    
 
     #Create population
     population = toolbox.population( n=population_size)
@@ -127,37 +131,39 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     stats.register("max", max)
     print("stats sets")
     population, log = algorithms.eaSimple(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
-        ngen=generations, stats=stats, halloffame=hof, verbose=False)
+        ngen=generations, stats=stats, halloffame=hof)
+    print("okay here we go")
 
+    #Find how to implement Elitism in there -> It's different than selective function
 
     # main evolution loop
-    for g in range(generations):
-        print("generation Nanan°"+str(g))
+    # for g in range(generations):
+    #     print("generation Nanan°"+str(g))
 
-        #2 different approaches here
-        # offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-        offspring = algorithms.varOr(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,lambda_=100)
-        #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
-        fitnesses = toolbox.map(toolbox.evaluate, offspring)
-        population = offspring
-        for value, individual in zip(fitnesses, offspring):
-            individual.fitness.values  = value
+    #     #2 different approaches here
+    #     # offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
+    #     offspring = algorithms.varOr(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,lambda_=100)
+    #     #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
+    #     fitnesses = toolbox.map(toolbox.evaluate, offspring)
+    #     population = offspring
+    #     for value, individual in zip(fitnesses, offspring):
+    #         individual.fitness.values  = value
         
-        population = toolbox.select(population, len(population))
+    #     population = toolbox.select(population, len(population))
 
-    if generations2 !=0 :
-           toolbox.register("mutate", mutate, indpb=0.05,
-                     mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)    
-           for g in range(generations2):
-                print("generation 2 Nanan°"+str(g))
+    # if generations2 !=0 :
+    #        toolbox.register("mutate", mutate, indpb=0.05,
+    #                  mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)    
+    #        for g in range(generations2):
+    #             print("generation 2 Nanan°"+str(g))
 
-                offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-                # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
-                #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
-                fitnesses = toolbox.map(toolbox.evaluate, offspring)
-                population = offspring
-                for value, individual in zip(fitnesses, offspring):
-                        individual.fitness.values  = value
+    #             offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
+    #             # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
+    #             #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
+    #             fitnesses = toolbox.map(toolbox.evaluate, offspring)
+    #             population = offspring
+    #             for value, individual in zip(fitnesses, offspring):
+    #                     individual.fitness.values  = value
           
 
     list1 = tools.selLexicase(population,1)
@@ -171,7 +177,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
 
     for a in listesol:
         image =draw(a)
-        image.save(str(random.randrange(90))+"solution.png")
+        image.save((str(random.randrange(90))+"solution.png"))
 
     f = open("ExecutionReport-"+str(datetime.datetime.now())+".txt", "x") 
     f.write(
