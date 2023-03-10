@@ -33,13 +33,14 @@ def draw(solution):
         canvas.polygon(polygon[1:], fill=polygon[0])
     return image
 
-#Diff kind of mutation I can Try to choose and implement
-# (add / update / replace polygon, change points / colour / z-order)
-#Don't forget that we re on a image, so all tje triangle are here
-
-#I could add a cascade function likedoing multiple things separately,
-#TODO implement it as perhaps a different mutate function ? 
-#TODO allow user to choose its probs
+#########################################
+#
+#
+#       This mutate function is the core of this evolutional algorithm
+#       It allows user to choose the weights of every probability and to choose as well
+#       if multiple changes can happen in the same mutation.
+#       Be carefull, I've add a check 
+#########################################
 def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
 
     if not independance :
@@ -134,8 +135,8 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         print("generation Nanan°"+str(g))
 
         #2 different approaches here
-        offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-        # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
+        # offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
+        offspring = algorithms.varOr(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,lambda_=100)
         #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
         fitnesses = toolbox.map(toolbox.evaluate, offspring)
         population = offspring
@@ -177,30 +178,30 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
           "Execution of the code with theses parameters\n"+
           "On this image bro "+TARGET_NAME+
          
-        "\ngenerations : " +generations+
-        "\ngenerations2 :"+generations2+
-        "\npopulation_size :"+population_size+
-        "\nseed : "+seed,
-        "\npolygons :"+polygons+
-        "\nmutation_rate :"+mutation_rate+
-        "\nmating_prob : "+mating_prob,
-        "\nmutate_pt :"+mutate_pt+
-        "\nshuffle :"+shuffle+
-        "\nremove_poly :"+remove_poly+
-        "\nadd_poly :"+add_poly+
-        "\nchange_cr :"+change_cr+
-        "\nadd_pt :"+add_pt+
-        "\nindependance :"+False+
-        "\nmutate_pt2 :"+mutate_pt2+
-        "\nshuffle2 :"+shuffle2+
-        "\nremove_poly2"+remove_poly2+
-        "\nadd_poly2 :"+add_poly2+
-        "\nchange_cr2 :"+change_cr2+
-        "\nadd_pt2 :"+add_pt2+
-        "\nindependance2 :"+False
+        "\ngenerations : " +str(generations)+
+        "\ngenerations2 :"+str(generations2)+
+        "\npopulation_size :"+str(population_size)+
+        "\nseed : "+str(seed),
+        "\npolygons :"+str(polygons)+
+        "\nmutation_rate :"+str(mutation_rate)+
+        "\nmating_prob : "+str(mating_prob),
+        "\nmutate_pt :"+str(mutate_pt)+
+        "\nshuffle :"+str(shuffle)+
+        "\nremove_poly :"+str(remove_poly)+
+        "\nadd_poly :"+str(add_poly)+
+        "\nchange_cr :"+str(change_cr)+
+        "\nadd_pt :"+str(add_pt)+
+        "\nindependance :"+str(False)+
+        "\nmutate_pt2 :"+str(mutate_pt2)+
+        "\nshuffle2 :"+str(shuffle2)+
+        "\nremove_poly2"+str(remove_poly2)+
+        "\nadd_poly2 :"+str(add_poly2)+
+        "\nchange_cr2 :"+str(change_cr2)+
+        "\nadd_pt2 :"+str(add_pt2)+
+        "\nindependance2 :"+str(False)
          +
          "We got theses results \n"+
-        log
+        str(log)
     )
     f.close
 #
