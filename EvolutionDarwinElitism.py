@@ -7,6 +7,7 @@ from deap import creator, base, tools, algorithms
 from IPython.display import display # to display images
 from PIL import Image, ImageDraw, ImageTk
 from PIL import ImageChops
+from elitism import eaSimpleWithElitism
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
@@ -127,7 +128,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     stats.register("std", statistics.stdev)
     stats.register("max", max)
     print("stats sets")
-    population, log = algorithms.eaSimple(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
+    population, log = eaSimpleWithElitism(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
         ngen=generations, stats=stats, halloffame=hof)
     print("okay here we go")
 
@@ -165,17 +166,17 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
 
     time = str(datetime.datetime.now())
     list1 = tools.selLexicase(population,1)
-    for a in list1:
+    # for a in list1:
         
-        image =draw(a)
-        image.save(time+"soluce.png")
+    #     image =draw(a)
+    #     image.save(time+"soluce.png")
     print(log)
     # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
     listesol =     tools.selLexicase(population,3)
 
-    # for a in listesol:
-    #     image =draw(a)
-    #     image.save((str(random.randrange(90))+"solution.png"))
+    for a in listesol:
+        image =draw(a)
+        image.save((str(random.randrange(90))+"solution.png"))
 
     f = open("ExecutionReport-"+time+".txt", "x") 
     f.write(
