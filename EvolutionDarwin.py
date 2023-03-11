@@ -10,7 +10,7 @@ from PIL import ImageChops
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
-TARGET_NAME="5b.png"
+TARGET_NAME="5a.png"
 MAX = 255 * 200 * 200
 TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
@@ -92,6 +92,8 @@ def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=
 def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
         ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False,
         mutate_pt2=0.8,shuffle2=0.05,remove_poly2=0.02,add_poly2=0.05,change_cr2=0.03,add_pt2=0.05,independance2=False):
+    f = open("proofrun-"+str(datetime.datetime.now())+".txt", "x") 
+    f.close()
 # Car c est la plus procche qu'on peut avoir
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
@@ -166,11 +168,12 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     #                     individual.fitness.values  = value
           
 
+    time = str(datetime.datetime.now())
     list1 = tools.selLexicase(population,1)
     for a in list1:
         
         image =draw(a)
-        image.save("solution.png")
+        image.save(time+"soluce.png")
     print(log)
     # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
     listesol =     tools.selLexicase(population,3)
@@ -179,7 +182,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         image =draw(a)
         image.save((str(random.randrange(90))+"solution.png"))
 
-    f = open("ExecutionReport-"+str(datetime.datetime.now())+".txt", "x") 
+    f = open("ExecutionReport-"+time+".txt", "x") 
     f.write(
           "Execution of the code with theses parameters\n"+
           "On this image bro "+TARGET_NAME+
@@ -187,10 +190,10 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         "\ngenerations : " +str(generations)+
         "\ngenerations2 :"+str(generations2)+
         "\npopulation_size :"+str(population_size)+
-        "\nseed : "+str(seed),
+        "\nseed : "+str(seed)+
         "\npolygons :"+str(polygons)+
         "\nmutation_rate :"+str(mutation_rate)+
-        "\nmating_prob : "+str(mating_prob),
+        "\nmating_prob : "+str(mating_prob)+
         "\nmutate_pt :"+str(mutate_pt)+
         "\nshuffle :"+str(shuffle)+
         "\nremove_poly :"+str(remove_poly)+
