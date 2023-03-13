@@ -133,9 +133,9 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     
     toolbox.register("mutate", mutate, indpb=0.05,
                      mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)
-
+    print('Changement de fct !!!!')
     population, log = eaSimpleWithElitism(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,
-        ngen=generations, stats=stats, halloffame=hof)
+        ngen=generations2, stats=stats, halloffame=hof)
 
 
     time = str(datetime.datetime.now())

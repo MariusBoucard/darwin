@@ -10,7 +10,7 @@ from PIL import ImageChops
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
-TARGET_NAME="5c.png"
+TARGET_NAME="5a.png"
 MAX = 255 * 200 * 200
 TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
@@ -131,36 +131,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         ngen=generations, stats=stats, halloffame=hof)
     print("okay here we go")
 
-    #Find how to implement Elitism in there -> It's different than selective function
 
-    # main evolution loop
-    # for g in range(generations):
-    #     print("generation Nanan°"+str(g))
-
-    #     #2 different approaches here
-    #     # offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-    #     offspring = algorithms.varOr(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,lambda_=100)
-    #     #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
-    #     fitnesses = toolbox.map(toolbox.evaluate, offspring)
-    #     population = offspring
-    #     for value, individual in zip(fitnesses, offspring):
-    #         individual.fitness.values  = value
-        
-    #     population = toolbox.select(population, len(population))
-
-    # if generations2 !=0 :
-    #        toolbox.register("mutate", mutate, indpb=0.05,
-    #                  mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)    
-    #        for g in range(generations2):
-    #             print("generation 2 Nanan°"+str(g))
-
-    #             offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-    #             # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
-    #             #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
-    #             fitnesses = toolbox.map(toolbox.evaluate, offspring)
-    #             population = offspring
-    #             for value, individual in zip(fitnesses, offspring):
-    #                     individual.fitness.values  = value
           
 
     time = str(datetime.datetime.now())

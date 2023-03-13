@@ -11,7 +11,7 @@ from elitism import eaSimpleWithElitism
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
-TARGET_NAME="5a.png"
+TARGET_NAME="5c.png"
 MAX = 255 * 200 * 200
 TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
@@ -116,9 +116,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     toolbox.register("evaluate", evaluate)
     #Whitch selection algorithm we're using
 
-    # Add a tournament selection as well
-    toolbox.register("select", tools.selection.selTournament(k=1,tournsize=tournsize))
-
+   
 
     #Create population
     population = toolbox.population( n=population_size)
@@ -128,6 +126,9 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     stats.register("std", statistics.stdev)
     stats.register("max", max)
     print("stats sets")
+     # Add a tournament selection as well
+    toolbox.register("select", tools.selection.selTournament, tournsize = tournsize)
+
     population, log = eaSimpleWithElitism(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
         ngen=generations, stats=stats, halloffame=hof)
     print("okay here we go")

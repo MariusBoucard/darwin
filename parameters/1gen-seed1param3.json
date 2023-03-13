@@ -1,0 +1,16 @@
+{
+   "seed" :31,
+
+   "generations" : 500,
+   "population_size" : 200,
+   "polygons" : 5,
+   "mutation_rate" : 0.6,
+   "mating_prob" : 0.4,
+   "mutate_pt" : 0.8,
+   "shuffle" : 0.02,
+   "remove_poly" : 0.03,
+   "add_poly" : 0.05,
+   "change_cr" : 0.05,
+   "add_pt" : 0.05,
+    "independance" : false
+}
