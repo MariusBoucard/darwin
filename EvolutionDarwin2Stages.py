@@ -170,8 +170,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         "\nadd_poly2 :"+str(add_poly2)+
         "\nchange_cr2 :"+str(change_cr2)+
         "\nadd_pt2 :"+str(add_pt2)+
-        "\nindependance2 :"+str(independance2)
-         +
+        "\nindependance2 :"+str(independance2)+
          "We got theses results \n"+
         str(log)+
         str(log2)
