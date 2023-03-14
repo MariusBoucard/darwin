@@ -12,5 +12,5 @@
    "change_cr" :0.03,
    "add_pt" : 0.05,
    "independance" : false,
-   "tournsize" : 70
+   "tournsize" : 10
 }

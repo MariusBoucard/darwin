@@ -11,7 +11,13 @@ from elitism import eaSimpleWithElitism
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
-TARGET_NAME="5c.png"
+
+#############################
+#
+#       Variant of the root algorithm with elitism implemented
+#
+#############################
+TARGET_NAME="5b.png"
 MAX = 255 * 200 * 200
 TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
@@ -86,14 +92,12 @@ def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=
 
 
 
-# -> Allow cross over in early stages
 
 def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
         ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False,
-        mutate_pt2=0.8,shuffle2=0.05,remove_poly2=0.02,add_poly2=0.05,change_cr2=0.03,add_pt2=0.05,independance2=False):
-    # f = open("proofrun-"+str(datetime.datetime.now())+".txt", "x") 
-    # f.close()
-# Car c est la plus procche qu'on peut avoir
+        ):
+
+
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
@@ -128,50 +132,16 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     stats.register("std", statistics.stdev)
     stats.register("max", max)
     print("stats sets")
+    #Not same algorithm than previous vertions because we wanted elitism
     population, log = eaSimpleWithElitism(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
         ngen=generations, stats=stats, halloffame=hof)
     print("okay here we go")
 
-    #Find how to implement Elitism in there -> It's different than selective function
-
-    # main evolution loop
-    # for g in range(generations):
-    #     print("generation Nanan°"+str(g))
-
-    #     #2 different approaches here
-    #     # offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-    #     offspring = algorithms.varOr(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,lambda_=100)
-    #     #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
-    #     fitnesses = toolbox.map(toolbox.evaluate, offspring)
-    #     population = offspring
-    #     for value, individual in zip(fitnesses, offspring):
-    #         individual.fitness.values  = value
-        
-    #     population = toolbox.select(population, len(population))
-
-    # if generations2 !=0 :
-    #        toolbox.register("mutate", mutate, indpb=0.05,
-    #                  mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)    
-    #        for g in range(generations2):
-    #             print("generation 2 Nanan°"+str(g))
-
-    #             offspring = algorithms.varAnd(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate)       
-    #             # offspring = algorithms.varOr(population,toolbox, cxpb=0.5, mutpb=0.5,lambda_=100)
-    #             #Same here, we can check for mu+lambda or mu, lambda but not in this first instance
-    #             fitnesses = toolbox.map(toolbox.evaluate, offspring)
-    #             population = offspring
-    #             for value, individual in zip(fitnesses, offspring):
-    #                     individual.fitness.values  = value
-          
-
     time = str(datetime.datetime.now())
     list1 = tools.selLexicase(population,1)
-    # for a in list1:
-        
-    #     image =draw(a)
-    #     image.save(time+"soluce.png")
+
     print(log)
-    # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
+   
     listesol =     tools.selLexicase(population,3)
 
     for a in listesol:
@@ -196,14 +166,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         "\nadd_poly :"+str(add_poly)+
         "\nchange_cr :"+str(change_cr)+
         "\nadd_pt :"+str(add_pt)+
-        "\nindependance :"+str(False)+
-        "\nmutate_pt2 :"+str(mutate_pt2)+
-        "\nshuffle2 :"+str(shuffle2)+
-        "\nremove_poly2"+str(remove_poly2)+
-        "\nadd_poly2 :"+str(add_poly2)+
-        "\nchange_cr2 :"+str(change_cr2)+
-        "\nadd_pt2 :"+str(add_pt2)+
-        "\nindependance2 :"+str(False)
+        "\nindependance :"+str(independance)
          +
          "We got theses results \n"+
         str(log)

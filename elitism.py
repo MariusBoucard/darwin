@@ -1,6 +1,12 @@
 from deap import tools
 from deap import algorithms
  
+
+######
+#
+# This algorithm, stole on github, implements the elitism mecanism on the eaSimple algorithm
+#
+######
 def eaSimpleWithElitism(population, toolbox, cxpb, mutpb, ngen, stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm is similar to DEAP eaSimple() algorithm, with the modification that

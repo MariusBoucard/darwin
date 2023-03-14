@@ -1,6 +1,6 @@
 {
    "seed" :31,
-    "generations" : 500,
+    "generations" : 5000,
     "population_size" : 200,
     "polygons" : 5,
     "mutation_rate" : 1,

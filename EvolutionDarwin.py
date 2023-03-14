@@ -10,14 +10,22 @@ from PIL import ImageChops
 import sys
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
-TARGET_NAME="5a.png"
+
+##################################
+#
+#       Root evolution algorithm for this project
+#       Make sur you load it with the righteous parameters
+#       ANd make sur to set the target image below
+#
+#
+##################################
+TARGET_NAME="5c.png"
 MAX = 255 * 200 * 200
 TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
 
 
-
-##Don t change it please
+#Function to compute distance between generated solutions and target image
 def evaluate(solution):
     image = draw(solution)
     diff = ImageChops.difference(image, TARGET)
@@ -25,7 +33,7 @@ def evaluate(solution):
     count = sum(i * n for i, n in enumerate(hist))
     return (MAX - count) / MAX,
 
-#If I want to display other things
+# We need to draw the solution to compute distance with target image
 def draw(solution):
     image = Image.new("RGB", (200, 200))
     canvas = ImageDraw.Draw(image, "RGBA")
@@ -75,8 +83,6 @@ def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=
             add_point(solution)
 
             
-    #La solution est une liste de polygiones, pour l'instant ons a ca
-    #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
     return solution,
 
 
@@ -85,11 +91,9 @@ def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=
 
 
 
-# -> Allow cross over in early stages
-
+#Our run funciton. It has default parameters but all of theses can be load in a single time by runing algorithm with a JSON file
 def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
-        ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False,
-        mutate_pt2=0.8,shuffle2=0.05,remove_poly2=0.02,add_poly2=0.05,change_cr2=0.03,add_pt2=0.05,independance2=False):
+        ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
     # f = open("proofrun-"+str(datetime.datetime.now())+".txt", "x") 
     # f.close()
 # Car c est la plus procche qu'on peut avoir
@@ -136,18 +140,14 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
 
     time = str(datetime.datetime.now())
     list1 = tools.selLexicase(population,1)
+    ##Here we just want to save the best result
     for a in list1:
         
         image =draw(a)
         image.save(time+"soluce.png")
     print(log)
-    # print("\nbest 3 in last population:\n", tools.selBest(population, k=3))
-    listesol =     tools.selLexicase(population,3)
 
-    # for a in listesol:
-    #     image =draw(a)
-    #     image.save((str(random.randrange(90))+"solution.png"))
-
+        #Lets save the logs to a file, to check them later
     f = open("ExecutionReport-"+time+".txt", "x") 
     f.write(
           "Execution of the code with theses parameters\n"+
@@ -166,22 +166,14 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         "\nadd_poly :"+str(add_poly)+
         "\nchange_cr :"+str(change_cr)+
         "\nadd_pt :"+str(add_pt)+
-        "\nindependance :"+str(False)+
-        "\nmutate_pt2 :"+str(mutate_pt2)+
-        "\nshuffle2 :"+str(shuffle2)+
-        "\nremove_poly2"+str(remove_poly2)+
-        "\nadd_poly2 :"+str(add_poly2)+
-        "\nchange_cr2 :"+str(change_cr2)+
-        "\nadd_pt2 :"+str(add_pt2)+
-        "\nindependance2 :"+str(False)
+        "\nindependance :"+str(independance)+
+       
          +
          "We got theses results \n"+
         str(log)
     )
     f.close
-#
-# Should had halloffames
-#should had statistics as well
+
 
 def read_config(path):
        with open(path) as f_in:
@@ -192,4 +184,3 @@ if __name__ == "__main__":
     params = read_config(sys.argv[1])
     #If we define the name of attributes greately in the json it will work
     run(**params)
-    # run(**params)

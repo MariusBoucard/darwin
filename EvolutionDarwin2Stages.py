@@ -11,14 +11,20 @@ import sys
 from elitism import eaSimpleWithElitism
 from mutationsUtils import mutate_point, change_color,remove_polygon,add_polygone,make_polygon, add_point,make_ellipse
 
+
+#####################################"
+# 
+# Derived from the root algorithm, this allows
+# user to set 2 differents stage in the evolution, with different mutate function parameters 
+#  
+#####################################
 TARGET_NAME="5a.png"
 MAX = 255 * 200 * 200
 TARGET = Image.open(TARGET_NAME)
 TARGET.load()  # read image and close the file
 
 
-
-##Don t change it please
+#Still our evaluate function
 def evaluate(solution):
     image = draw(solution)
     diff = ImageChops.difference(image, TARGET)
@@ -26,13 +32,14 @@ def evaluate(solution):
     count = sum(i * n for i, n in enumerate(hist))
     return (MAX - count) / MAX,
 
-#If I want to display other things
+# Obviously we still wants to display solution to compute distance to the target with it
 def draw(solution):
     image = Image.new("RGB", (200, 200))
     canvas = ImageDraw.Draw(image, "RGBA")
     for polygon in solution:
         canvas.polygon(polygon[1:], fill=polygon[0])
     return image
+
 
 #########################################
 #
@@ -41,6 +48,8 @@ def draw(solution):
 #       It allows user to choose the weights of every probability and to choose as well
 #       if multiple changes can happen in the same mutation.
 #       Be carefull, I've add a check 
+
+#       In this algorithm, the weights will be changed during runtime with what user specified
 #########################################
 def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False):
 
@@ -75,25 +84,17 @@ def mutate(solution, indpb,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=
         if rand<add_pt :
             add_point(solution)
 
-            
-    #La solution est une liste de polygiones, pour l'instant ons a ca
-    #[[(123, 81, 206, 59), (103, 171), (69, 184), (179, 37)],...
+
     return solution,
 
 
 
 
 
-
-
-# -> Allow cross over in early stages
-
 def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=20,mutation_rate=0.9,mating_prob = 0.01
         ,mutate_pt=0.8,shuffle=0.05,remove_poly=0.02,add_poly=0.05,change_cr=0.03,add_pt=0.05,independance=False,
         mutate_pt2=0.8,shuffle2=0.05,remove_poly2=0.02,add_poly2=0.05,change_cr2=0.03,add_pt2=0.05,independance2=False):
-    # f = open("proofrun-"+str(datetime.datetime.now())+".txt", "x") 
-    # f.close()
-# Car c est la plus procche qu'on peut avoir
+ 
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
@@ -102,7 +103,6 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     toolbox = base.Toolbox()
     pool = multiprocessing.Pool(8)
     toolbox.register("map", pool.map)
-    # toolbox.register("mutate", mutate, indpb=0.05)
     toolbox.register("individual", tools.initRepeat, creator.Individual,  make_polygon, n=polygons)
     toolbox.register("population",tools.initRepeat, list, toolbox.individual)
     print("here for long")
@@ -114,9 +114,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
                      mutate_pt=mutate_pt,shuffle=shuffle,remove_poly=remove_poly,add_poly=add_poly,change_cr=change_cr,add_pt=add_pt,independance=independance)
     #We have to tell him to evaluate the distance between both pictures
     toolbox.register("evaluate", evaluate)
-    #Whitch selection algorithm we're using
-
-    # Add a tournament selection as well
+    #Which selection algorithm we're using
     toolbox.register("select", tools.selection.selLexicase)
 
 
@@ -131,10 +129,11 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
     population, log = eaSimpleWithElitism(population, toolbox, cxpb=mating_prob, mutpb=mutation_rate,
         ngen=generations, stats=stats, halloffame=hof)
     
+    #We change the parameters according to the number of generations spend with old ones
     toolbox.register("mutate", mutate, indpb=0.05,
                      mutate_pt=mutate_pt2,shuffle=shuffle2,remove_poly=remove_poly2,add_poly=add_poly2,change_cr=change_cr2,add_pt=add_pt2,independance=independance2)
-    print('Changement de fct !!!!')
-    population, log = eaSimpleWithElitism(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,
+    print('Parameter changed ')
+    population, log2 = eaSimpleWithElitism(population,toolbox, cxpb=mating_prob, mutpb=mutation_rate,
         ngen=generations2, stats=stats, halloffame=hof)
 
 
@@ -145,8 +144,7 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         image =draw(a)
         image.save(time+"soluce.png")
 
-    listesol = tools.selLexicase(population,3)
-
+    #Still writing report
     f = open("ExecutionReport-"+time+".txt", "x") 
     f.write(
           "Execution of the code with theses parameters\n"+
@@ -165,17 +163,18 @@ def run(generations=500,generations2=0, population_size=100,  seed=30,polygons=2
         "\nadd_poly :"+str(add_poly)+
         "\nchange_cr :"+str(change_cr)+
         "\nadd_pt :"+str(add_pt)+
-        "\nindependance :"+str(False)+
+        "\nindependance :"+str(independance)+
         "\nmutate_pt2 :"+str(mutate_pt2)+
         "\nshuffle2 :"+str(shuffle2)+
         "\nremove_poly2"+str(remove_poly2)+
         "\nadd_poly2 :"+str(add_poly2)+
         "\nchange_cr2 :"+str(change_cr2)+
         "\nadd_pt2 :"+str(add_pt2)+
-        "\nindependance2 :"+str(False)
+        "\nindependance2 :"+str(independance2)
          +
          "We got theses results \n"+
-        str(log)
+        str(log)+
+        str(log2)
     )
     f.close
 #
